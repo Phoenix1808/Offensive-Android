@@ -68,7 +68,7 @@ class MainActivity : AppCompatActivity() {
         startVideo.setOnClickListener {
             val intent = Intent(this, VideoRecorder::class.java).apply {
                 action = "START_RECORDING"
-                putExtra("cameraId","0")
+                putExtra("cameraId","0") //0 for back camera and 1 for other
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
                 startForegroundService(intent)
